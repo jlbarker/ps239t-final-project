@@ -1,0 +1,601 @@
+---
+title: "Analyzing and Visualizing Other Explanatory Variables with Initial Dataset"
+author: "Jennie Barker"
+date: "5/3/2020"
+output: html_document
+---
+## Part 3: In this script, I get to the main part of my analysis, in which I examine the relationship between the international funding restrictions in the Bakke et all dataset and 1.) requests for election assistance (von Borzykowski) 2.) civil society participation (V-Dem) and 3.) public opinion of the U.S. and China (Gallup)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Load Packages
+```{r}
+# Remove all objects
+rm(list=ls())
+
+# Unload all packages 
+library(pacman)
+pacman::p_unload(all)
+
+# Add packages 
+pacman::p_load(
+  tidyverse, 
+  data.table,  
+  foreign, 
+  magrittr, 
+  skimr, 
+  readxl,
+  ggthemes,
+  writexl
+)
+```
+## 2. Set Working Directory 
+
+```{r}
+setwd("~/Documents/Comp Tools - Spring 2020/Final Project ")
+getwd()
+```
+## 3. Is there a relationship between requesting technical election assistance and international funding restrictions? 
+
+# Load and subset initial and new datasets 
+```{r}
+# Load Initial Dataset 
+restrictions_new <- read.csv("restrictions_new.csv")
+
+# Load Election Assistance Dataset 
+load("Borzyskowski2016.Rdata")
+election_assistance_raw <- table
+
+#Save to upload to the Github 
+write.csv(election_assistance_raw, "election_assistance_raw.csv")
+
+#The data does not easily present itself for merging with the initial restrictions dataset, as it only includes election years rather than all years. For this dataset, I will just do some simple plots. 
+
+#Subset to only get relevant columns 
+election_assistance_new <- select(election_assistance_raw, CountryName, year, RequestTechElAsst_UN, RequestObservers)
+
+write.csv(election_assistance_new, file="election_assistance_new.csv")
+```
+
+# Building the Dataframe 
+
+```{r}
+# Frequency of elections by country 
+elec_frequency <- election_assistance_new %>%
+  count(CountryName) %>%
+  group_by(CountryName)
+```
+
+```{r}
+# Sum of total requests by country 
+total_requests <- election_assistance_new %>%
+  group_by(CountryName) %>%
+  summarise(TechAssistance = sum(RequestTechElAsst_UN, na.rm = T), Observers = sum(RequestObservers, na.rm = T))
+```
+
+```{r}
+# Add columns together 
+total_requests_election <- total_requests %>% 
+  add_column(ElecFrequency = elec_frequency$n)
+
+# Add columns with proportion of election years with requests for tech assistance and observers to ease comparison in visualizations 
+total_requests_election_prop <- total_requests_election %>%
+  mutate(ProportionTech = TechAssistance / ElecFrequency) %>% #mutate to incorporate proportion 
+  mutate(ProportionObserver = Observers / ElecFrequency)
+```
+
+```{r} 
+#Now I want to check how many names overlap in the initial restrictions dataset and the election assistance dataset:
+
+# Get countries that had restrictions on international funding (n = 49)
+intlfunding_countries <- restrictions_new %>%
+  group_by(COUNTRY) %>%
+  filter(sum(FUNDING_INT) >= 1)
+
+# Sum of yearly total by country 
+intlfunding_country_names <- intlfunding_countries %>%
+  group_by(COUNTRY) %>%
+  summarise(International_Restriction = sum(FUNDING_INT, na.rm = T))
+
+# Check overlap 
+shared_country_names <- intlfunding_country_names[intlfunding_country_names$COUNTRY %in% total_requests_election$CountryName,]
+print(shared_country_names)
+
+# There are only 39 countries that overlap (plus Cote d'Ivoire and Serbia--something funny appears to be happening because of the ', so there are 41 countries that overlap). This is likely because some countries included in the restrictions dataset may not hold elections (China, Saudi Arabia, UAE, Vietnam, and Eritrea are examples).
+```
+
+```{r}
+#Now I will subset the elections frequency dataset to only include the countries that are in the international funding restrictions dataset, which will help me merge the dataset. 
+
+total_requests_election_subsetted <- filter(total_requests_election_prop, CountryName %in% c("Algeria", "Armenia", "Azerbaijan", "Bangladesh", "Belarus", "Cote d’Ivoire", "Egypt", "Equatorial Guinea", "Ethiopia", "Fiji", "Hungary", "India", "Indonesia", "Iran", "Iraq", "Israel", "Jordan", "Kazakhstan", "Kuwait", "Kyrgyz Republic", "Malaysia", "Nicaragua", "North Korea", "Oman", "Peru", "Russia", "Rwanda", "Singapore", "Serbia (Yugoslavia)", "Slovakia", "Sri Lanka", "Sudan", "Syria", "Togo", "Tunisia", "Turkey", "Ukraine", "Uzbekistan", "Venezuela", "Yemen", "Zimbabwe"))
+```
+
+```{r}
+# Now I want to add the column with the total number of restrictions from the other dataset to the election assistance dataset 
+
+# Removing countries that do not match in the subsetted initial dataset
+intlfunding_countries_subsetted <- filter(intlfunding_country_names, !COUNTRY %in% c("Barbados", "China", "Eritrea", "Saudi Arabia", "South Sudan", "United Arab Emirates", "Vietnam"))
+
+# Rename two entries in the election dataset 
+total_requests_election_subsetted$CountryName <- sub("Cote d’Ivoire", "Cote d'Ivoire", total_requests_election_subsetted$CountryName)
+
+total_requests_election_subsetted$CountryName <- sub("Serbia (Yugoslavia)", "Serbia", total_requests_election_subsetted$CountryName)
+
+# Because I struggled with the Serbia entry in this dataset, I'll just change it in the other one. 
+
+intlfunding_countries_subsetted$COUNTRY <- sub("Serbia", "Serbia (Yugoslavia)", intlfunding_countries_subsetted$COUNTRY)
+
+```
+
+```{r}
+# Now, I am going to combine these two datasets 
+
+df1 <- total_requests_election_subsetted %>% 
+  add_column(IntlFundingRestriction = intlfunding_countries_subsetted$International_Restriction) 
+
+# Add a column with proportional value of international funding restrictions so that it matches the proportion of election years
+df1<- df1 %>%
+  mutate(IntlFundingProp = IntlFundingRestriction / 20)
+
+View(df1)
+  
+```
+
+```{r}
+# This data frame likely requires more mutation for the best visualization. 
+
+# Turn proportional variables into four-tiered categorical variables
+df2 <- df1 %<>%
+  mutate(ProportionTech = ifelse(ProportionTech >= 0.6666666, "3", ifelse(ProportionTech >= 0.3333333, "2", ifelse(ProportionTech > 0, "1", "0"))))
+
+df2 <- df1 %>%
+mutate(ProportionObserver = ifelse(ProportionObserver >= 0.6666666, "3", ifelse(ProportionObserver >= 0.3333333, "2", ifelse(ProportionObserver > 0, "1", "0"))))
+
+# Ensure that the columns are factor
+
+df2$ProportionTech <- as.factor(df2$ProportionTech)
+df2$ProportionObserver <- as.factor(df2$ProportionObserver)
+
+#Save to upload to the Github 
+write.csv(df2, file = "restrictions_assistance.csv")
+
+```
+
+# Visualize: countries with international funding restrictions and requests for election assistance 
+
+```{r}
+#Finally, we can visualize this! 
+
+ggplot(df2, aes(x = reorder(CountryName, IntlFundingRestriction), y = IntlFundingRestriction, fill = ProportionTech)) + #will change the bar graph colors to match the values in ProportionTech
+  geom_bar(stat = "identity") +
+  labs(x = "Country", y = "Total Number of Yrs", fill = "% of Election Years with Requests") + #labels 
+  ggtitle("Total Number of Years with International Funding \n Restrictions and Proportion of Years with \n Requests for Assistance") +
+    theme_economist()+ 
+    theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5, size = 8,  margin=margin(-20,0,0,0)), legend.text = element_text(size = 7), plot.title = element_text(hjust = 0.5)) + #make font size smaller for legend text 
+  scale_fill_discrete(labels = c("None", "0 - 33%", "33 - 66%", "Up to 100%")) #label legend
+
+# Save plot to upload to Github 
+ggsave("funding_electionassistance.png")
+```
+# Visualize: countries with international funding restrictions and requests for election observers 
+```{r}
+# How does this look for proportion of requests for observers? 
+
+ggplot(df2, aes(x = reorder(CountryName, IntlFundingRestriction), y = IntlFundingRestriction, fill = ProportionObserver)) + #will change the bar graph colors to match the values in ProportionObserver
+  geom_bar(stat = "identity") +
+  labs(x = "Country", y = "Total Number of Yrs", fill = "% of Election Years with Requests") + #labels 
+  ggtitle("Total Number of Years with International Funding \n Restrictions and Proportion of Years with \n Requests for Observers") +
+    theme_economist()+ 
+    theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5, size = 8,  margin=margin(-20,0,0,0)), legend.text = element_text(size = 7), plot.title = element_text(hjust = 0.5)) + #make font size smaller for legend text 
+  scale_fill_discrete(labels = c("None", "0 - 33%", "33 - 66%", "Up to 100%")) #label legend
+
+# Save plot to upload to Github 
+ggsave("funding_electionobservers.png")
+```
+## 4. What is the relationship between civil society participation and international funding restrictions? 
+
+# The first step is to download VDEM data on Civil Society Participation 
+
+```{r}
+vdem <- readRDS("V-Dem-CY-Core-v10.rds")
+
+# There is an incredible amount of data here. I will begin subsetting it. 
+
+# Only get Civil Society Participation Index Score, along with country name and year
+vdem_subsetted <- select(vdem, country_name, year, v2x_cspart)
+
+# Get rid of years that I do not need (I will match it with Bakke et al: 1994-2014)
+
+vdem_subsetted <-filter(vdem_subsetted, year %in% c(1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014))
+
+# Get rid of donor countries to match Bakke et al. 
+
+vdem_subsetted <- filter(vdem_subsetted, !country_name %in% c("Australia", "Austria", "Belgium", "Canada", "Denmark", "Finland", "France", "Germany", "Greece", "Iceland", "Ireland", "Italy", "Japan", "Korea, Republic of", "Luxembourg", "Netherlands", "New Zealand", "Norway", "Portugal", "Spain", "Sweden", "Switzerland", "Taiwan", "United Kingdom", "United States of America"))
+
+# Save as csv to upload to the github 
+
+write.csv(vdem_subsetted, file = "vdem_subsetted.csv")
+
+# Subset Bakke et al as well
+
+restrictions_subsetted <- select(restrictions_new, COUNTRY, YEAR, FUNDING_INT)
+```
+
+# Prepare to merge 
+```{r}
+# Check overlap
+shared_country_names1 <- restrictions_subsetted[restrictions_subsetted$COUNTRY %in% vdem_subsetted$country_name,]
+print(shared_country_names1)
+
+# There isn't perfect overlap here...only 2819 observations of 3111 and 3216 overlap here. This is likely because of names of countries, as well as countries not included. I will have to further subset the datasets so they match. 
+```
+
+```{r}
+# I need to fix a few manual errors (missing years especially), which I will do in Excel 
+
+# Not run - will overwrite Excel files 
+#write_xlsx(x = restrictions_subsetted, path = "restrictions_subsetted.xlsx", col_names = TRUE)
+
+# Not run 
+#write_xlsx(x = vdem_subsetted, path = "vdem_subsetted.xlsx", col_names = TRUE)
+```
+
+```{r}
+# Now I will reload the data 
+
+vdem_subsetted_1 <- read_excel("vdem_subsetted.xlsx")
+restrictions_subsetted_1 <- read_excel("restrictions_subsetted.xlsx")
+
+# Now I will save these as csv files to upload to the Github 
+
+write.csv(vdem_subsetted_1, file = "vdem_subsetted_1.csv")
+write.csv(restrictions_subsetted_1, file = "restrictions_subsetted_1")
+```
+
+## Combining the Datasets
+```{r}
+# Now I will merge the datasets using the inner_join function (which merges based on the two shared columns)
+total <- inner_join(vdem_subsetted_1, restrictions_subsetted_1)
+
+xtabs(~FUNDING_INT, data = total)
+
+# We can see that there are 239 observations of restrictions and 2768 with no observations 
+```
+
+
+## Visualize data 
+```{r}
+# Now I can visualize the data. I want to start with comparing the average civil society partcipation during restriction years and non-restriction years 
+
+viz1 <- total %>%
+  group_by(FUNDING_INT) %>%
+  summarise(mean_value = mean(v2x_cspart)) # average value of all countries
+
+ggplot(viz1, aes(x = FUNDING_INT, y= mean_value)) + 
+  geom_bar(stat = "identity", width = 0.5, fill = "deepskyblue") + #bar graph
+  labs(x = "Country-Year Observations", y = "Mean Index Score") + #labels 
+  ggtitle("Civil Society Participation Index \nDuring Restriction and Non-Restriction Years \n for all Recipient Countries") +
+    theme_economist() +
+  ylim(0, 1) +
+  scale_x_discrete(limits=c(0, 1)) + #scale bar graph 
+  theme(text = element_text(family = "Arial"), plot.title = element_text(hjust = 0.5)) 
+
+# Save image to Github 
+
+ggsave("funding_civlsociety.png")
+
+```
+
+```{r} 
+# Now by year 
+viz2 <- total %>%
+  group_by(FUNDING_INT, YEAR) %>%
+  summarise(mean_value = mean(v2x_cspart))
+
+ggplot(viz2, aes(x = YEAR, y= mean_value, fill = factor(FUNDING_INT))) + #factor so FUNDING_INT is read as categorical 
+  geom_bar(stat = "identity", position = "dodge") + # so that they aren't stacked but are side by side 
+  labs(x = "Year", y = "Mean Index Score", fill = "Restriction") +
+  ggtitle("Civil Society Participation Index by Year /n for all Recipient Countries") +
+    theme_economist() +
+  ylim(0, 1) + 
+  theme(text = element_text(family = "Arial"), plot.title = element_text(hjust = 0.5)) 
+
+# Save image to Github 
+
+ggsave("funding_civlsociety_byyear.png")
+```
+
+```{r}
+# Next, I want to make a visualization based on a logit regression of the data 
+
+logit <- glm(formula = FUNDING_INT ~ v2x_cspart, family = "binomial", data = total)
+
+coef1 <- broom::tidy(logit, conf.int = TRUE) %>% print()
+
+#Using Julia's sample code 
+coef1 %>% 
+  filter(term != "(Intercept)") %>%
+  ggplot(aes(x = term, y = estimate)) +
+  geom_point() +
+  geom_pointrange(aes(ymin = conf.low, ymax = conf.high)) +
+  geom_hline(aes(yintercept = 0), colour = "#990000", linetype = "dashed") + 
+  labs(title = "Coefficients of logit regression model") +
+  ylab(NULL) + xlab(NULL) +
+  theme_economist()
+
+## Because of the sparcity of the dataset that I used, this may be why this looks the way it does. Either way, it was good practice to see how I might generate this type of plot when I have a better statistical background. 
+
+ggsave("funding_civlsociety_coefficients.png")
+
+```
+
+## 5. How do countries that have implemented restrictions view the US?
+
+## Get the data and subset it 
+
+```{r}
+# Load raw Gallup data on worldwide public opinion on U.S. leadership 
+gallup_us <- read_excel("Gallup_USLeadership.xlsx")
+
+View(gallup_us)
+
+# Remove donor country observations and subset to include only years 2009-2014, which have the most consistent observations for most countries 
+
+#Select countries 
+gallup_us_subsetted <- filter(gallup_us, !Country %in% c("Australia", "Austria", "Belgium", "Canada", "Denmark", "Finland", "France", "Germany", "Greece", "Iceland", "Ireland", "Italy", "Japan", "South Korea", "Luxembourg", "Netherlands", "New Zealand", "Norway", "Portugal", "Spain", "Sweden", "Switzerland", "Taiwan", "United Kingdom"))
+
+#Select years 
+gallup_us_subsetted <-filter(gallup_us_subsetted, Year %in% c(2009, 2010, 2011, 2012, 2013, 2014))
+
+# Save to upload to the Github 
+write.csv(gallup_us_subsetted, file = "gallup_us_subsetted.csv")
+```
+
+```{r}
+# Subset restrictions dataset to include only those same yearly observations 
+
+restrictions_subsetted_gallup <- filter(restrictions_subsetted, YEAR %in% c(2009, 2010, 2011, 2012, 2013, 2014))
+
+#There are over 200 observations that are different between the two datasets. Because this is likely due to missing yearly observations, I will manually fix it. 
+
+#Not run
+# write_xlsx(x = restrictions_subsetted_gallup, path = "restrictions_subsetted_gallup.xlsx", col_names = TRUE)
+
+# Not run 
+#write_xlsx(x = gallup_us_subsetted, path = "gallup_us_subsetted.xlsx", col_names = TRUE)
+
+```
+
+## Join dataframes 
+
+```{r}
+# Re-add data 
+gallup_us_subsetted1 <- read_excel("gallup_us_subsetted.xlsx")
+restrictions_subsetted_gallup_us <- read_excel("restrictions_subsetted_gallup.xlsx")
+
+# Join datasets 
+
+# Mutate Year column within gallup dataframe so it matches the other 
+gallup_us_subsetted1 <- gallup_us_subsetted1 %>% mutate(Year = as.numeric(Year))
+
+#Merge datasets using inner_join function 
+total1 <- inner_join(gallup_us_subsetted1, restrictions_subsetted_gallup_us)
+
+xtabs(~FUNDING_INT, data = total1)
+```
+
+## Visualize data 
+
+```{r}
+# Approval of US Leadership - Grouped 
+viz3 <- total1 %>%
+  group_by(FUNDING_INT) %>%
+  summarise(mean_value = mean(Approve)) #mean value of approval 
+
+ggplot(viz3, aes(x = FUNDING_INT, y= mean_value)) + 
+  geom_bar(stat = "identity", width = 0.5, fill = "red4") + #bar graph 
+  labs(x = "Country-Year Observations", y = "Mean Approval of US Leadership") +
+  ggtitle("Mean Approval of US Leadership \nDuring Restriction and Non-Restriction Years") +
+    theme_economist() +
+  ylim(0, 1) +
+  scale_x_discrete(limits=c(0, 1)) + 
+  theme(text = element_text(family = "Arial"), plot.title = element_text(hjust = 0.5)) 
+
+ggsave("funding_usapproval_total.png")
+
+```
+
+```{r}
+# Approval of US Leadership - By Year 
+
+viz4 <- total1 %>%
+  group_by(FUNDING_INT, Year) %>%
+  summarise(mean_value = mean(Approve))
+
+ggplot(viz4, aes(x = Year, y= mean_value, fill = factor(FUNDING_INT))) + #factor so FUNDING_INT is read as categorical 
+  geom_bar(stat = "identity", position = "dodge") + # so that they aren't stacked but are side by side 
+  labs(x = "Year", y = "Mean Approval of US Leadership", fill = "Restriction") + ggtitle("Approval of US Leadership by Year") +
+    theme_economist() +
+  ylim(0, 1) + 
+  theme(text = element_text(family = "Arial"), plot.title = element_text(hjust = 0.5)) +
+  scale_fill_manual(values = c("#3366FF", "#006600"))
+
+# Save plot to upload to Github 
+ggsave("funding_usapproval_year.png")
+```
+
+## 6. How do countries that have implemented restrictions view China?
+
+# Load data 
+```{r}
+gallup_china <- read_excel("Gallup_ChinaLeadership.xlsx")
+
+View(gallup_china)
+
+# Remove donor country observations and subset to include only years 2009-2014, which have the most consistent observations for most countries 
+
+gallup_china_subsetted <- filter(gallup_china, !Country %in% c("Australia", "Austria", "Belgium", "Canada", "Denmark", "Finland", "France", "Germany", "Greece", "Iceland", "Ireland", "Italy", "Japan", "South Korea", "Luxembourg", "Netherlands", "New Zealand", "Norway", "Portugal", "Spain", "Sweden", "Switzerland", "Taiwan", "United Kingdom", "United States of America"))
+
+gallup_china_subsetted <-filter(gallup_china_subsetted, Year %in% c(2009, 2010, 2011, 2012, 2013, 2014))
+
+#Save as CSV to upload to Github 
+write.csv(gallup_china_subsetted, file = "gallup_china_subsetted.csv")
+```
+
+```{r}
+# Check overlap 
+
+shared_country_names <- restrictions_subsetted_gallup_us[restrictions_subsetted_gallup_us$Country %in% gallup_china_subsetted$Country,]
+print(shared_country_names)
+
+# There are a few observations that do not overlap. I will edit it and reload it back into R. 
+
+#Not run
+#write_xlsx(x = gallup_china_subsetted, path = "gallup_china_subsetted.xlsx", col_names = TRUE)
+```
+
+# Join dataframes 
+
+```{r}
+# Reload data 
+gallup_china_subsetted <- read_excel("gallup_china_subsetted.xlsx")
+restrictions_subsetted_gallup_china <- read_excel("restrictions_subsetted_gallup_china.xlsx")
+
+# Make sure the year column from the gallup data is of the same class 
+gallup_china_subsetted <- gallup_china_subsetted %>% mutate(Year = as.numeric(Year))
+
+#Merge datasets using join function 
+total2 <- inner_join(gallup_china_subsetted, restrictions_subsetted_gallup_china)
+```
+
+## Visualize data 
+
+```{r}
+# Approval of China's Leadership - Grouped 
+viz5 <- total2 %>%
+  group_by(FUNDING_INT) %>%
+  summarise(mean_value = mean(Approve))
+
+ggplot(viz5, aes(x = FUNDING_INT, y= mean_value)) + 
+  geom_bar(stat = "identity", width = 0.5, fill = "red4") +
+  labs(x = "Country-Year Observations", y = "Mean Approval of China's Leadership") +
+  ggtitle("Mean Approval of China's Leadership \nDuring Restriction and Non-Restriction Years") +
+    theme_economist() +
+  ylim(0, 1) +
+  scale_x_discrete(limits=c(0, 1)) + #organize bars 
+  theme(text = element_text(family = "Arial"), plot.title = element_text(hjust = 0.5)) 
+
+# Save to upload to Github 
+ggsave("funding_chinaapproval_total.png")
+
+```
+
+```{r}
+# Approval of China's Leadership - By Year 
+
+viz6 <- total2 %>%
+  group_by(FUNDING_INT, Year) %>%
+  summarise(mean_value = mean(Approve))
+
+ggplot(viz6, aes(x = Year, y= mean_value, fill = factor(FUNDING_INT))) + #factor so FUNDING_INT is read as categorical 
+  geom_bar(stat = "identity", position = "dodge") + # so that they aren't stacked but are side by side 
+  labs(x = "Year", y = "Mean Approval of China's Leadership", fill = "Restriction") + ggtitle("Approval of China's Leadership by Year") +
+    theme_economist() +
+  ylim(0, 1) + 
+  theme(text = element_text(family = "Arial"), plot.title = element_text(hjust = 0.5)) +
+  scale_fill_manual(values = c("#3366FF", "#006600"))
+
+#Save plot to upload to Github 
+ggsave("funding_chinaapproval_year.png")
+
+```
+
+## Do disapproval rates differ? 
+```{r}
+# US Disapproval 
+
+viz7 <- total1 %>%
+  group_by(FUNDING_INT, Year) %>%
+  summarise(mean_value = mean(Disapprove))
+
+ggplot(viz4, aes(x = Year, y= mean_value, fill = factor(FUNDING_INT))) + #factor so FUNDING_INT is read as categorical 
+  geom_bar(stat = "identity", position = "dodge") + # so that they aren't stacked but are side by side 
+  labs(x = "Year", y = "Mean Disapproval of US Leadership", fill = "Restriction") + ggtitle("Disapproval of US Leadership by Year") +
+    theme_economist() +
+  ylim(0, 1) + 
+  theme(text = element_text(family = "Arial"), plot.title = element_text(hjust = 0.5)) +
+  scale_fill_manual(values = c("#9966CC", "#66CCCC"))
+
+#Save to upload to Github 
+ggsave("funding_usdisapproval_year.png")
+```
+
+```{r}
+viz8 <- total2 %>%
+  group_by(FUNDING_INT, Year) %>%
+  summarise(mean_value = mean(Disapprove))
+
+ggplot(viz4, aes(x = Year, y= mean_value, fill = factor(FUNDING_INT))) + #factor so FUNDING_INT is read as categorical 
+  geom_bar(stat = "identity", position = "dodge") + # so that they aren't stacked but are side by side 
+  labs(x = "Year", y = "Mean Disapproval of China's Leadership", fill = "Restriction") + ggtitle("Disapproval of China's Leadership by Year") +
+    theme_economist() +
+  ylim(0, 1) + 
+  theme(text = element_text(family = "Arial"), plot.title = element_text(hjust = 0.5)) +
+  scale_fill_manual(values = c("#FFFF66", "#99CCFF"))
+
+# Save to upload to Github 
+ggsave("funding_chinadisapproval_year.png")
+```
+
+## 7. Trust in NGOs or Charitable Organizations 
+
+# My final analysis is the levels of trust in NGOs in countries that have implemented restrictions versus those that have not. This survey was only conducted in 2018, so I will simply add a column in the Gallup dataset of whether or not the country experienced a restriction at some point in between 1994-2014. This is based on the list of countries generated in my comparison of Bakke et al (2020). and Dupuy et al. (2016) 
+
+# Load data 
+```{r}
+gallup_ngos <- read_excel("Gallup_NGOs.xlsx")
+
+# Remove donor countries 
+gallup_ngos <- filter(gallup_ngos, !Country %in% c("Australia", "Austria", "Belgium", "Canada", "Denmark", "Finland", "France", "Germany", "Greece", "Iceland", "Ireland", "Italy", "Japan", "South Korea", "Luxembourg", "Netherlands", "New Zealand", "Norway", "Portugal", "Spain", "Sweden", "Switzerland", "Taiwan", "United Kingdom", "United States of America"))
+
+```
+
+# Visualize data 
+
+```{r}
+# Grouped 
+viz9 <- gallup_ngos %>%
+  group_by(Restriction) %>%
+  summarise(mean_value = mean(Yes))
+
+ggplot(viz9, aes(x = Restriction, y= mean_value)) + 
+  geom_bar(stat = "identity", width = 0.5, fill = "blue") + 
+  labs(x = "Restriction", y = "Mean Trust in NGOs and Charitable Orgs") + ggtitle("Mean Trust in NGOs and Charitable Organizations") +
+    theme_economist() +
+  ylim(0, 1) + 
+  theme(text = element_text(family = "Arial"), plot.title = element_text(hjust = 0.5)) +
+  scale_x_discrete(limits=c(0, 1)) 
+
+#Save to upload to Github 
+ggsave("funding_NGOtrust.png")
+```
+
+```{r} 
+# How does mean approval vary among countries with restrictions? 
+
+#Subset to only include countries in the original Bakke et al dataset 
+gallup_ngos_subset <- filter(gallup_ngos, Country%in% c("Algeria", "Armenia", "Azerbaijan", "Bangladesh", "Belarus", "Cote d'Ivoire", "Egypt", "Equatorial Guinea", "Ethiopia", "Fiji", "Hungary", "India", "Indonesia", "Iran", "Iraq", "Israel", "Jordan", "Kazakhstan", "Kuwait", "Kyrgyz Republic", "Malaysia", "Nicaragua", "North Korea", "Oman", "Peru", "Russia", "Rwanda", "Singapore", "Serbia", "Slovakia", "Sri Lanka", "Sudan", "Syria", "Togo", "Tunisia", "Turkey", "Ukraine", "Uzbekistan", "Venezuela", "Yemen", "Zimbabwe"))
+
+ggplot(gallup_ngos_subset, aes(x = Country, y= Yes)) + 
+  geom_bar(stat = "identity", width = 0.5) + 
+  labs(y = "Mean Trust in NGOs and Charitable Orgs") + ggtitle("Mean Trust in NGOs and Charitable Organization \n by Country with Restriction") +
+    theme_economist() +
+  ylim(0, 0.8) +
+  theme(text = element_text(family = "Arial"), plot.title = element_text(hjust = 0.5)) +
+  theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5, size = 8,  margin=margin(-15,0,0,0))) + 
+   xlab(NULL)
+
+ggsave("funding_NGOtrust_bycountry.png")
+```
