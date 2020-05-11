@@ -1,0 +1,135 @@
+---
+title: "Comparing the Initial Dataset with Another Dataset"
+author: "Jennie Barker"
+date: "5/10/2020"
+output: html_document
+---
+## Part 2: In this script, I compare the number of foreign funding restrictions identified in Bakke et al (2020) with Dupuy et al (2016) and develop a map comparing the two datasets. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 1. Load Packages
+```{r}
+# Remove all objects
+rm(list=ls())
+
+# Unload all packages 
+library(pacman)
+pacman::p_unload(all)
+
+# Add packages 
+pacman::p_load(
+  tidyverse, 
+  data.table,  
+  foreign, 
+  magrittr, 
+  skimr, 
+  readxl,
+  ggthemes,
+  stringr,
+  rworldmap #for mapping 
+)
+```
+## 2. Set Working Directory 
+
+```{r}
+setwd("~/Documents/Comp Tools - Spring 2020/Final Project ")
+getwd()
+```
+
+# 3. Load initial dataset 
+```{r}
+restrictions_new <- read.csv("restrictions_new.csv")
+```
+
+## 4. Comparing Initial Dataset with a Similar Dataset
+#Load data 
+```{r}
+# It is important to note that the Bakke et al. (2020) dataset explicitly focuses on restrictions on NGOs that work on human rights. I will thus cross-verify the countries that placed international funding restrictions  using another dataset,  Dupuy et al. (2016), Replication Data for "Hands off My Regime!". 
+
+# Unlike Bakke et al. (2020), this dataset does not capture over time variation in restrictions, nor does it disaggregate by type. Instead, it only indicates when a country implemented a law that restricts foreign funding. Then the country drops out of the analysis. This dataset also focuses on formalized legal restrictions as opposed to de facto restrictions, which Bakke et al (2020) incorporate 
+
+handsoff_raw <- read_excel("Dupuy_dataset.xlsx")
+
+# Save Dupuy dataset to upload to the Github 
+write.csv(handsoff_raw, file = "handsoff_raw.csv")
+```
+
+# Explore new dataset
+```{r}
+# Identify which countries have implemented a law that restricts foreign funding of NGOs 
+handsoff_countries <- handsoff_raw %>%
+  group_by(country) %>%
+  filter(sum(law) >= 1) #this will filter out the countries that have not placed a restriction 
+
+#As with the initial dataset, I am only interested in recipient countries so will subset out the donor countries in the dataset. 
+
+handsoff_countries_new <- filter(handsoff_countries, !country %in% c("Australia", "Austria", "Belgium", "Canada", "Denmark", "Finland", "France", "Germany", "Greece", "Iceland", "Ireland", "Italy", "Japan", "Korea, Republic of", "Luxembourg", "Netherlands", "New Zealand", "Norway", "Portugal", "Spain", "Sweden", "Switzerland", "Taiwan", "United Kingdom", "United States of America"))
+
+# Save dataset to upload to the Github 
+write.csv(handsoff_countries_new, file = "handsoff_new.csv")
+
+# See which countries implemented restrictions 
+handsoff_country_names <- handsoff_countries_new %>% 
+  group_by(country) %>%
+  summarise(Funding_Restriction = sum(law, na.rm = T))
+
+## This indicates that there are 45 countries that have implemented laws that restrict foreign funding of NGOs. 
+
+```
+
+# Compare countries in Dupuy et al (2016) with Bakke et al (2020)
+
+```{r}
+#Get countries from Bakke et al with restrictions 
+intlfunding_countries <- restrictions_new %>%
+  group_by(COUNTRY) %>%
+  filter(sum(FUNDING_INT) >= 1) #this will filter out the countries without this type of restriction 
+
+# Sum of yearly total by country 
+intlfunding_country_names <- intlfunding_countries %>%
+  group_by(COUNTRY) %>%
+  summarise(International_Restriction = sum(FUNDING_INT, na.rm = T))
+
+# Now I want to check if the two dataframes with international funding restrictions have the same names
+shared_country_names <- intlfunding_country_names[intlfunding_country_names$COUNTRY %in% handsoff_country_names$country,]
+print(shared_country_names)
+
+##We can see there are only 24 countries that overlap in the two datasets, which is not great news for me in terms of using Bakke et al (2020) as a proxy for restrictions on democracy assistance in the future. While I will still  Bakke et al (2020) to do my further analysis for this project, I will use the pool of countries listed in both datasets to do in the next section, as well. 
+```
+
+## 5. Map of Countries with Restrictions from the Two Datasets 
+# Where is there overlap? 
+
+```{r}
+# I will use rworldmap to make a map of the findings from both datasets 
+
+# To avoid some of the merging dataset issues for this particular aspect of the project, I created a new dataset in Excel that includes all of the countries, which I load here. 
+
+map_df <- read_excel("map_data.xlsx")
+
+# Save new dataframe to upload to the Github 
+write.csv(map_df, file =  "map_df.csv")
+
+# Create vector with names based on the column names in map_df: 
+
+countries <- data.frame(country = c("AFG", "DZA", "AGO", "ARM", "AZE", "BHR", "BGD", "BRB", "BLR", "BLZ", "BEN", "BTN", "BOL", "BDI", "CMR", "CHN", "CIV", "ECU", "EGY", "GNQ", "ERI", "ETH", "FJI", "HUN", "IND", "IDN", "IRN", "IRQ", "ISR", "JOR", "KAZ", "KWT", "KGZ", "MYS", "MMR", "NPL", "NIC", "PRK", "OMN", "PAK", "PER", "QAT", "RUS", "RWA", "SAU", "SRB", "SLE", "SGP", "SVK", "SOM", "SSD", "LKA", "SDN", "SYR", "THA", "TGO", "TUN", "TUR", "TKM", "UGA", "UKR", "ARE", "URY", "UZB", "VEN", "VNM", "YEM", "ZWE"), dataset = c(2, 3, 2, 1, 3, 2, 1, 1, 3, 2, 2, 2, 2, 2, 2, 3, 1, 2, 3, 3, 3, 3, 1, 1, 3, 3, 1, 1, 3, 3, 1, 1, 1, 1, 2, 2, 1, 1, 3, 2, 1, 2, 3, 3, 1, 1, 2, 3, 1, 2, 1, 3, 3, 1, 2, 1, 3, 1, 2, 2, 3, 1, 2, 3, 3, 3, 1, 3)) #using IS03 country codes in rworldmap
+
+# Create initial map 
+dataset_map <-joinCountryData2Map(countries, joinCode = "ISO3", nameJoinColumn = "country")
+
+# Save image to upload to Github
+png("restrictions_map.png")
+# Edit map with colors, titles, and limits 
+par(mar=c(1,1,1,1)) #map parameters 
+dataset_actual_map <- mapCountryData(dataset_map, nameColumnToPlot = "dataset", catMethod = "categorical", mapRegion = "world", missingCountryCol = gray(.8),  colourPalette = c("gold", "lightgreen", "mediumpurple1"), mapTitle = "Countries with Foreign Funding Restrictions", addLegend = FALSE) #add legend later 
+
+#Add legend 
+dataset_actual_map$legendText <- c('Bakke et al. (2020)', 'Dupuy et al. (2016)', 'Both')
+
+#Move legend 
+do.call(addMapLegendBoxes, c(dataset_actual_map, x = 'bottomleft', title = 'Dataset', horiz = FALSE))
+
+```
