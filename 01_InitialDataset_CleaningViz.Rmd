@@ -1,0 +1,380 @@
+---
+title: "Initial Data Collection, Cleaning, and Analysis"
+author: "Jennie Barker"
+date: "5/2/2020"
+output: html_document
+---
+## Part 1: In this script, I download, clean, and analyze the initial dataset of interest: Bakke et al (2020)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Collect and Clean Initial Dataset ###
+# The initial dataset that I want to analyze is Bakke et al. (2020) "State Restrictions on Civil Society." 
+
+## 1. Load Packages
+```{r}
+# Remove all objects
+rm(list=ls())
+
+# Unload all packages 
+library(pacman)
+pacman::p_unload(all)
+
+# Add packages 
+pacman::p_load(
+  tidyverse, 
+  data.table,  
+  foreign, 
+  magrittr, 
+  skimr, 
+  readxl,
+  ggthemes,
+  stringr,
+  rworldmap
+)
+```
+## 2. Set Working Directory 
+
+```{r}
+setwd("~/Documents/Comp Tools - Spring 2020/Final Project ")
+getwd()
+```
+
+## 3. Load and Examine Dataset 
+
+```{r} 
+# Load data - Bakke et al. 2020 - Database on State Restrictions on Civil Society
+restrictions_raw <- read_excel("Bakke_dataset.xlsx")
+
+# View data 
+restrictions_raw %>% skimr::skim()
+
+# Load raw data as csv file for uploading to the Github repository 
+write.csv(restrictions_raw,  file="restrictions_raw.csv")
+
+```
+
+
+## 4. Subset Dataset
+# For the purposes of this project, I am only interested in particular variables in the overall dataset, which includes over 40 variables of 3597 observations. I thus subset the dataset to create a new dataset with only the variables that I want (particularly funding restrictions)
+
+```{r}
+# Subset data 
+restrictions_subsetted <- select(restrictions_raw, cowcode, COUNTRY, YEAR, ACTIVITIES_RESTRICT, VISIT_RESTRICT, TRAVEL_RESTRICT, FUNDING_INT, FUNDING_DOM, VISAS_DIFFICULTIES, VISAS_DENIED, HARASS_AMOUNT, ARREST, SURVEIL, KILLING, COOPT) 
+
+```
+
+
+# I am also only interested in recipient countries of democracy assistance, while this dataset includes both donor countries and recipient countries. I thus further subset the dataset. I do this based on members of the DAC minus Eastern European countries, which continue to receive democracy assistance. 
+```{r}
+# Filter data based on country name and create new data frame 
+restrictions_new <- filter(restrictions_subsetted, !COUNTRY %in% c("Australia", "Austria", "Belgium", "Canada", "Denmark", "Finland", "France", "Germany", "Greece", "Iceland", "Ireland", "Italy", "Japan", "Korea, Republic of", "Luxembourg", "Netherlands", "New Zealand", "Norway", "Portugal", "Spain", "Sweden", "Switzerland", "Taiwan", "United Kingdom", "United States of America"))
+
+restrictions_new %>% skimr::skim()
+```
+
+
+## 5. Check Missing Data 
+ 
+```{r}
+restrictions_new %<>%
+  mutate_if(is.character, list(str_trim))
+
+restrictions_new %>%
+  # Keep only character variables 
+  select_if(is.character) %>%
+  # Recode character variables as 1 if cell is empty 
+  mutate_all(list(~ifelse(.=="NA",1,0))) %>%
+  # Add up empty cells for each character variable 
+  summarise_all(sum, na.rm=T) %>%
+  # Transpose data for visibility 
+  t() 
+```
+
+## 6. Save new data frame 
+
+```{r}
+# This will be uploaded to the Github repository 
+write.csv(restrictions_new,  file="restrictions_new.csv")
+```
+
+## 7. Summary Statistics 
+
+# Before visualizing the initial dataset, I will do some initial summary statistics. This will help me decide what visualizations I want to make. 
+
+```{r}
+# First, I will see how many countries had international funding restrictiosn each year using the group_by function and the summarise function 
+restrictions_new %>%
+  group_by(YEAR) %>%
+  summarise(International_Restriction = sum(FUNDING_INT, na.rm=T))
+```
+## International Funding Restrictions 
+
+```{r}
+# Now, I want to see the countries that are behind the international funding restrictions.
+
+# Determine which countries have had at least one yearly instance of international funding restrictions
+intlfunding_countries <- restrictions_new %>%
+  group_by(COUNTRY) %>%
+  filter(sum(FUNDING_INT) >= 1) #this will filter out the countries without this type of restriction 
+
+# Sum of yearly total by country 
+intlfunding_country_names <- intlfunding_countries %>%
+  group_by(COUNTRY) %>%
+  summarise(International_Restriction = sum(FUNDING_INT, na.rm = T))
+
+print(intlfunding_country_names)
+
+# We can now see the countries that have had international funding restrictions in place and how many years they have done so. It appears ~49 countries in total have placed legal restrictions on international funding for NGOs at some point between 1994-2014. 
+```
+
+## Visa Denials and Difficulties 
+
+```{r}
+# While I am mostly interested in international funding restrictions, I will also check which countries had visa restrictions, as these could affect people working at international organizations that give democracy assistance. 
+
+restrictions_new %>%
+  group_by(YEAR) %>%
+  summarise(Visa_Restrictions = sum(VISAS_DENIED, na.rm = T))
+```
+
+```{r}
+# Following a similar script as above: 
+
+# # Determine which countries have had at least one yearly instance of visa denial 
+visas_countries <- restrictions_new %>%
+  group_by(COUNTRY) %>%
+  filter(sum(VISAS_DENIED) >= 1) #this will filter out the countries without this type of restriction 
+
+# Sum of yearly total per country
+visas_country_names <- visas_countries %>%
+  group_by(COUNTRY) %>%
+  summarise(Visa_Denial = sum(VISAS_DENIED, na.rm = T))
+
+print(visas_country_names)
+
+# We can see that many more countries (75) have denied visas at some point than placed restrictions on international funding (49). 
+
+```
+
+
+```{r}
+# Since there are two variables related to visas, I will now look into their combination. 
+
+# Determine which countries have had at least one yearly instance of visa denial or difficulties 
+visas_both_countries <- restrictions_new %>%
+  group_by(COUNTRY) %>%
+  filter(sum(VISAS_DENIED) >= 1 | sum(VISAS_DIFFICULTIES >= 1)) #using the OR function to filter based on both conditions 
+
+# Sum of yearly total per country 
+visas_both_country_names <- visas_both_countries %>%
+  group_by(COUNTRY) %>%
+  summarise(Visa_Denial = sum(VISAS_DENIED), Visa_Difficulty = sum(VISAS_DIFFICULTIES)) #summarise based on two variables 
+
+print(visas_both_country_names)
+
+##There are only 5 additional countries that had visa difficulties without having visa denials. I will only focus on visa denials in the future.  
+```
+## Cooptation of NGOs 
+
+```{r}
+# The third variable I will investigate is the cooptation of NGOs, which indicates if the government sought to bring NGOs under its influence. 
+
+# Determine which countries have had at least one yearly instance of cooptation
+coopt_countries <- restrictions_new %>%
+  group_by(COUNTRY) %>%
+  filter(sum(COOPT) >= 1) #this will filter out the countries without this type of restriction 
+
+# Show sum of year totals per country 
+coopt_country_names <- coopt_countries %>%
+  group_by(COUNTRY) %>%
+  summarise(Cooptation = sum(COOPT, na.rm = T))
+
+print(coopt_country_names)
+
+# This reveals a list of 51 countries that sought to coopt NGOs at some point between 1994-2014. 
+
+```
+
+## Arrests, Harassment, and Killings 
+
+```{r}
+# For data visualization purposes, I will also investigate the countries that had arrests, harassment, and killings of members of NGOs. Unlike the previous variables, arrests and harassment are not binary; 0 indicates none, 1 indicates some, and 2 indicates frequent/systematic. 
+
+
+# Determine which countries have had at least one yearly instance of arrests, harassment, or killings. 
+attacks_countries <- restrictions_new %>%
+  group_by(COUNTRY) %>%
+  filter(sum(ARREST) >= 1 | sum(HARASS_AMOUNT) >= 1 | sum(KILLING) >= 1) #use OR function for three conditions 
+
+# Because two of the variables are not binary, I will group by year. 
+attacks_country_names <- attacks_countries %>%
+  group_by(COUNTRY, YEAR) %>%
+  summarise(Arrest = sum(ARREST, na.rm = T), Harassment = sum(HARASS_AMOUNT, na.rm = T), Killings = sum(KILLING, na.rm = T))
+
+# Show sum of year totals per country 
+print(attacks_country_names)
+
+# 123 countries experienced arrest, harassment, or killings. It appears harassment is most common. 
+
+```
+
+```{r}
+# Which countries explicitly experienced frequent/systematic harassment or arrests? This will require some mutation from categorical to binary data 
+
+# Mutate existing dataframe and save into a new dataframe
+restrictions_new_edited <- restrictions_new %>%
+  mutate(ARREST = ifelse(ARREST == "2", 1, 0)) %>% 
+  mutate(HARASS_AMOUNT = ifelse(HARASS_AMOUNT == "2", 1, 0))
+
+# Save edited data frame for Github 
+write.csv(restrictions_new_edited,  file="restrictions_new_edited.csv")
+
+# Determine which countries have had at least one yearly instance of frequent arrests or harassment
+arrests_harass <- restrictions_new_edited %>%
+  group_by(COUNTRY) %>%
+  filter(sum(ARREST) >= 1 | sum(HARASS_AMOUNT) >= 1)
+
+# Show sum of year totals per country 
+arrests_harass_countries <- arrests_harass %>%
+  group_by(COUNTRY) %>%
+  summarise(Arrest = sum(ARREST, na.rm = T), Harassment = sum(HARASS_AMOUNT, na.rm = T))
+
+print(arrests_harass_countries)
+
+# A total of 78 countries exerpienced either systematic arrests or harassment.
+
+```
+
+## 8. Initial Dataset Visualizations (of key variables)
+# The summary statistics above give me a good idea of the initial visualizations I want to do. 
+
+## International Funding Restrictions by Year 
+```{r} 
+# From above, I have already created relevant dataframes for this visualization: intlfunding_countries and intlfunding_country_names. 
+
+# Because this data is binary, I need to first sum the instances by year 
+intl_df <- intlfunding_countries %>% 
+  group_by(YEAR) %>%
+  summarise(total_intlfunding = sum(FUNDING_INT, na.rm=T))
+
+# Now I will create the line plot 
+ggplot (intl_df, aes (x=YEAR, y= total_intlfunding)) +
+  geom_line() + #line graph 
+  geom_point() + #points at yearly intervals 
+  labs( x = "Year", y = "Countries with New Restrictions") + #x and y labels 
+  ggtitle("Total Countries with New Restrictions on \n International Funding of NGOs") + #title 
+  ylim(0, 25) + #limit for the y-axis 
+  theme_economist()+ 
+  theme(text = element_text(family = "Arial"), plot.title = element_text(hjust = 0.5)) + #plot.title centers the title 
+  geom_vline(xintercept = 2003, color = "red") #Indication of the Rose Revolution in Georgia 
+
+# Save plot for Github 
+ggsave("initialdataset_intlfunding_lineplot.png")
+```
+
+# Total Number International Funding Restrictions 
+
+```{r}
+# Now I want to visualize the how many years each country had a new international funding restriction. 
+intl_df1 <- intlfunding_countries %>% 
+  group_by(COUNTRY) %>% #group by country instead of year 
+  summarise(total_intlfunding = sum(FUNDING_INT, na.rm=T))
+
+# Now I will create a bar graph 
+ggplot(intl_df1, aes(total_intlfunding)) + 
+  geom_bar(fill = "steelblue2") + #bar graph 
+  labs( x = "Total Number of Years with New Restrictions", y = "Number of Countries") +
+  ggtitle("Total Number of Years with International \n Funding Restrictions") +
+  theme_economist() +
+  theme(text = element_text(family = "Arial"), plot.title = element_text(hjust = 0.5)) #plot.title centers the title 
+
+# Save plot for Github 
+ggsave("initialdataset_intlfunding_barplot_years.png")
+```
+
+# Total International Funding Restrictions by Country 
+```{r}
+# Finally, I want to look at the total number of years with new funding restrictions by country 
+intl_df1 <- intlfunding_countries %>% 
+  group_by(COUNTRY) %>%
+  filter(sum(FUNDING_INT) > 1) %>% #filter out countries without restrictions
+  summarise(total_intlfunding = sum(FUNDING_INT, na.rm=T))
+
+
+# Now I will create a bar graph 
+ggplot(intl_df1, aes (x = reorder(COUNTRY, total_intlfunding), y= total_intlfunding)) + #reorder based on number of years 
+  geom_bar(stat = "identity", width = 0.5) + #bar graph 
+  labs(x = "Country", y = "Total Number of Years") + 
+  ggtitle("Countries' Total Number of Years with \n International Funding Restrictions") +
+    theme_economist() + 
+    theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5, size = 8, margin=margin(-20,0,0,0))) + #Some of the country names are a bit long to fit on the graph, so I'll shorten them.
+  theme(text = element_text(family = "Arial"), plot.title = element_text(hjust = 0.5)) #plot.title centers the title 
+
+# Save plot to upload to Github 
+ggsave("initialdataset_intlfunding_barplot_countries.png")
+```
+
+# International Funding Restrictions in Comparison with Visa Denials and Cooptation
+
+```{r}
+# As noted above, I am only focusing on visa denials instead of both visa denials and difficulties, as there was significant overlap between the two variables. 
+
+intl_visa_coopt_df <- restrictions_new %>%
+  group_by(YEAR) %>%
+  summarise(total_intlfunding = sum(FUNDING_INT, na.rm = T), total_visas = sum(VISAS_DENIED, na.rm = T), total_coopt = sum(COOPT, na.rm = T)) #include visas in the data frame
+
+# Now to the line plot 
+
+ggplot (intl_visa_coopt_df, aes (x=YEAR)) +
+  geom_point(aes(y = total_intlfunding), color = "olivedrab") + #Points on the line 
+  geom_point(aes(y = total_visas), color = "deepskyblue1") +
+  geom_point(aes(y = total_coopt), color = "gold") +
+  geom_line(aes(y = total_intlfunding, color = "olivedrab")) + #Different color lines for each variable 
+  geom_line(aes(y = total_visas, color = "deepskyblue1")) +
+  geom_line(aes(y = total_coopt, color = "gold")) + 
+  labs( x = "Year", y = "Number of Countries") + # labels
+  ggtitle("Total Countries with Different Types of \n Restrictions per Year") + #title 
+  ylim(0, 30) + 
+  theme_economist()+ 
+  theme(text = element_text(family = "Arial"), plot.title = element_text(hjust = 0.5)) + 
+  geom_vline(xintercept = 2003, color = "red") + #Indication of the Rose Revolution in Georgia 
+  scale_color_identity(name = "Number of Countries", #Legend 
+                       breaks = c("olivedrab", "deepskyblue1", "gold"),
+                       labels = c("Intl. Funding Restrictions", "Visa Denials",   "Cooptation"),
+                       guide = "legend") +
+    theme(text = element_text(family = "Arial"), plot.title = element_text(hjust = 0.5)) + #plot.title centers the title 
+theme(legend.title = element_text(size = 9), 
+               legend.text = element_text(size = 9)) #decrease legend text size 
+# Save plot for uploading to Github 
+ggsave("initialdataset_intlfunding_visas_cooptation.png")
+
+```
+
+# International Funding Restrictions in Comparison with Frequent/Systematic Harassment 
+
+```{r}
+# Finally, I want to plot international funding restrictions with frequent harassment of NGOs using a bubble plot. I already created a binary measure of frequent harassment earlier (line 200)
+intl_attack <- restrictions_new_edited %>%
+  group_by(YEAR) %>%
+  summarise(total_intlfunding = sum(FUNDING_INT, na.rm = T), Harassment = sum(HARASS_AMOUNT, na.rm = T))
+
+#Now to the bubble plot  
+
+ggplot(intl_attack, aes(x = YEAR, y = total_intlfunding, size = Harassment)) + # size indicates the bubble plot 
+  geom_point() + #the size will map onto the point graph 
+  labs(x = "Year", y = "Number of Countries with Restrcitions") +
+  ggtitle("Total Countries with International Funding Restrictions \n and Systematic Harassment of NGOs") +
+  scale_size(name="Number of Countries with Harassment") + #for the bubble plot legend
+  ylim(0, 30) +
+  theme_economist() +
+  theme(text = element_text(family = "Arial"), plot.title = element_text(hjust = 0.5)) + 
+  geom_vline(xintercept = 2003, color = "red") #Color Revolution
+
+# Save plot for uploading to the Github 
+ggsave("initialdataset_intlfunding_harassment.png")
+
+```
+
