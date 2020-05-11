@@ -1,0 +1,575 @@
+"","CountryName","year","RequestTechElAsst_UN","RequestObservers"
+"1","Cuba",1993,0,0
+"2","Cuba",1998,0,0
+"3","Cuba",2003,0,0
+"4","Haiti",1990,1,1
+"5","Haiti",1995,1,1
+"6","Haiti",1995,1,1
+"7","Haiti",1997,0,1
+"8","Haiti",2000,1,1
+"9","Haiti",2000,1,1
+"10","Dominican Republic",1990,0,1
+"11","Dominican Republic",1994,0,1
+"12","Dominican Republic",1996,0,1
+"13","Dominican Republic",1998,0,0
+"14","Dominican Republic",2000,0,1
+"15","Dominican Republic",2002,0,1
+"16","Jamaica",1993,0,0
+"17","Jamaica",1997,0,1
+"18","Jamaica",2002,1,1
+"19","Trinidad and Tobago",1991,0,0
+"20","Trinidad and Tobago",1995,0,0
+"21","Trinidad and Tobago",2000,0,1
+"22","Trinidad and Tobago",2001,0,1
+"23","Trinidad and Tobago",2002,0,0
+"24","Mexico",1991,0,0
+"25","Mexico",1994,1,1
+"26","Mexico",1997,0,1
+"27","Mexico",2000,1,1
+"28","Mexico",2003,1,0
+"29","Guatemala",1990,0,1
+"30","Guatemala",1994,0,0
+"31","Guatemala",1995,0,1
+"32","Guatemala",1999,1,1
+"33","Guatemala",2003,1,1
+"34","Honduras",1993,0,1
+"35","Honduras",1997,1,1
+"36","Honduras",2001,1,1
+"37","El Salvador",1991,0,1
+"38","El Salvador",1994,1,1
+"39","El Salvador",1997,0,1
+"40","El Salvador",1999,1,1
+"41","El Salvador",2000,0,1
+"42","El Salvador",2003,0,1
+"43","Nicaragua",1990,1,1
+"44","Nicaragua",1996,1,1
+"45","Nicaragua",2001,1,1
+"46","Costa Rica",1990,0,1
+"47","Costa Rica",1994,0,1
+"48","Costa Rica",1998,0,1
+"49","Costa Rica",2002,0,1
+"50","Panama",1991,0,1
+"51","Panama",1994,1,1
+"52","Panama",1999,0,1
+"53","Colombia",1990,0,1
+"54","Colombia",1990,0,NA
+"55","Colombia",1991,0,0
+"56","Colombia",1994,1,0
+"57","Colombia",1994,0,0
+"58","Colombia",1998,0,0
+"59","Colombia",1998,0,0
+"60","Colombia",2002,1,1
+"61","Colombia",2002,1,1
+"62","Venezuela",1993,0,1
+"63","Venezuela",1998,0,1
+"64","Venezuela",1998,0,1
+"65","Venezuela",1999,0,NA
+"66","Venezuela",2000,0,1
+"67","Guyana",1992,1,1
+"68","Guyana",1997,1,1
+"69","Guyana",2001,1,1
+"70","Ecuador",1990,0,0
+"71","Ecuador",1992,0,0
+"72","Ecuador",1994,0,NA
+"73","Ecuador",1996,0,NA
+"74","Ecuador",1997,0,NA
+"75","Ecuador",1998,0,NA
+"76","Ecuador",2002,1,NA
+"77","Peru",1990,0,NA
+"78","Peru",1992,1,1
+"79","Peru",1995,1,1
+"80","Peru",2000,0,1
+"81","Peru",2001,1,1
+"82","Brazil",1990,0,0
+"83","Brazil",1994,1,1
+"84","Brazil",1998,0,0
+"85","Brazil",2002,0,0
+"86","Bolivia",1993,0,0
+"87","Bolivia",1997,0,1
+"88","Bolivia",2002,1,1
+"89","Paraguay",1991,0,0
+"90","Paraguay",1993,1,1
+"91","Paraguay",1998,0,1
+"92","Paraguay",2000,0,1
+"93","Paraguay",2003,1,1
+"94","Chile",1993,0,0
+"95","Chile",1997,0,0
+"96","Chile",1999,0,0
+"97","Chile",2001,0,0
+"98","Argentina",1991,0,0
+"99","Argentina",1993,1,0
+"100","Argentina",1994,0,0
+"101","Argentina",1995,0,0
+"102","Argentina",1997,0,0
+"103","Argentina",1999,0,NA
+"104","Argentina",2001,0,0
+"105","Argentina",2003,1,0
+"106","Uruguay",1994,0,0
+"107","Uruguay",1999,0,1
+"108","East Germany",1990,0,NA
+"109","Poland",1990,0,0
+"110","Poland",1991,0,1
+"111","Poland",1993,0,0
+"112","Poland",1995,0,0
+"113","Poland",1997,0,0
+"114","Poland",2000,0,0
+"115","Poland",2001,0,0
+"116","Hungary",1990,0,1
+"117","Hungary",1994,0,1
+"118","Hungary",1998,0,1
+"119","Hungary",2002,0,1
+"120","Czechoslovakia",1990,0,1
+"121","Czechoslovakia",1992,0,0
+"122","Czech Republic",1996,0,0
+"123","Czech Republic",1996,0,0
+"124","Czech Republic",1998,0,1
+"125","Czech Republic",1998,0,0
+"126","Czech Republic",2000,0,0
+"127","Czech Republic",2002,0,1
+"128","Czech Republic",2002,0,0
+"129","Slovakia",1994,0,1
+"130","Slovakia",1999,0,1
+"131","Slovakia",2002,0,1
+"132","Albania",1991,0,1
+"133","Albania",1992,1,1
+"134","Albania",1996,0,1
+"135","Albania",1997,0,1
+"136","Albania",2001,1,1
+"137","Macedonia (FYROM)",1994,1,1
+"138","Macedonia (FYROM)",1998,1,1
+"139","Macedonia (FYROM)",1999,0,1
+"140","Macedonia (FYROM)",2002,0,1
+"141","Croatia",1992,0,1
+"142","Croatia",1993,0,1
+"143","Croatia",1995,0,1
+"144","Croatia",1997,1,1
+"145","Croatia",1997,0,1
+"146","Croatia",2000,0,1
+"147","Croatia",2000,0,1
+"148","Croatia",2003,0,1
+"149","Serbia (Yugoslavia)",1992,0,1
+"150","Serbia (Yugoslavia)",1992,0,1
+"151","Serbia (Yugoslavia)",1996,0,1
+"152","Serbia (Yugoslavia)",2000,0,1
+"153","Serbia (Yugoslavia)",2002,0,1
+"154","Serbia (Yugoslavia)",2003,0,1
+"155","Serbia (Yugoslavia)",2003,0,1
+"156","Bosnia-Herzegovina",1996,0,1
+"157","Bosnia-Herzegovina",1998,0,1
+"158","Bosnia-Herzegovina",2000,0,1
+"159","Bosnia-Herzegovina",2002,0,1
+"160","Slovenia",1992,0,1
+"161","Slovenia",1996,0,0
+"162","Slovenia",1997,0,0
+"163","Slovenia",2000,0,0
+"164","Slovenia",2002,0,0
+"165","Cyprus",1991,0,0
+"166","Cyprus",1993,0,1
+"167","Cyprus",1996,0,0
+"168","Cyprus",1998,0,0
+"169","Cyprus",2001,0,0
+"170","Cyprus",2003,0,0
+"171","Bulgaria",1990,0,1
+"172","Bulgaria",1991,0,1
+"173","Bulgaria",1992,0,1
+"174","Bulgaria",1994,0,1
+"175","Bulgaria",1996,0,1
+"176","Bulgaria",1997,0,1
+"177","Bulgaria",2001,0,1
+"178","Bulgaria",2001,0,1
+"179","Moldova",1991,0,0
+"180","Moldova",1994,1,1
+"181","Moldova",1996,0,1
+"182","Moldova",1998,0,1
+"183","Moldova",2001,0,1
+"184","Romania",1990,1,1
+"185","Romania",1992,1,1
+"186","Romania",1996,0,1
+"187","Romania",2000,0,1
+"188","Russia",1990,0,1
+"189","Russia",1991,0,1
+"190","Russia",1993,1,1
+"191","Russia",1995,0,NA
+"192","Russia",1996,0,1
+"193","Russia",1999,0,1
+"194","Russia",2000,0,1
+"195","Russia",2003,0,1
+"196","Estonia",1990,0,1
+"197","Estonia",1992,0,1
+"198","Estonia",1995,0,1
+"199","Estonia",1999,0,1
+"200","Estonia",2003,0,NA
+"201","Latvia",1993,0,1
+"202","Latvia",1995,0,1
+"203","Latvia",1998,0,1
+"204","Latvia",2002,0,1
+"205","Lithuania",1992,0,1
+"206","Lithuania",1993,0,1
+"207","Lithuania",1996,0,1
+"208","Lithuania",1997,0,0
+"209","Lithuania",2000,0,0
+"210","Lithuania",2002,0,0
+"211","Ukraine",1991,0,1
+"212","Ukraine",1994,1,1
+"213","Ukraine",1994,1,1
+"214","Ukraine",1998,0,1
+"215","Ukraine",1999,0,1
+"216","Ukraine",2002,0,1
+"217","Belarus",1994,0,1
+"218","Belarus",1995,0,1
+"219","Belarus",1995,0,1
+"220","Belarus",2000,0,1
+"221","Belarus",2001,0,1
+"222","Armenia",1991,0,NA
+"223","Armenia",1995,1,1
+"224","Armenia",1996,0,1
+"225","Armenia",1998,1,1
+"226","Armenia",1999,1,1
+"227","Armenia",2003,1,1
+"228","Armenia",2003,1,1
+"229","Georgia",1992,0,1
+"230","Georgia",1995,0,1
+"231","Georgia",1999,0,1
+"232","Georgia",2000,0,1
+"233","Georgia",2003,1,1
+"234","Azerbaijan",1991,0,0
+"235","Azerbaijan",1992,0,0
+"236","Azerbaijan",1993,0,1
+"237","Azerbaijan",1995,1,1
+"238","Azerbaijan",1998,0,1
+"239","Azerbaijan",2000,0,1
+"240","Azerbaijan",2003,0,1
+"241","Guinea-Bissau",1994,1,1
+"242","Guinea-Bissau",1999,1,1
+"243","Equatorial Guinea",1993,0,1
+"244","Equatorial Guinea",1996,0,1
+"245","Equatorial Guinea",1999,0,1
+"246","Equatorial Guinea",2002,0,1
+"247","Gambia",1992,0,0
+"248","Gambia",1996,1,0
+"249","Gambia",1997,1,0
+"250","Gambia",2001,1,1
+"251","Gambia",2002,1,1
+"252","Mali",1992,0,0
+"253","Mali",1992,1,1
+"254","Mali",1997,1,1
+"255","Mali",1997,1,0
+"256","Mali",1997,1,0
+"257","Mali",2002,1,1
+"258","Mali",2002,0,0
+"259","Senegal",1993,1,1
+"260","Senegal",1993,1,0
+"261","Senegal",1998,0,0
+"262","Senegal",2000,0,1
+"263","Senegal",2001,0,1
+"264","Benin",1991,0,1
+"265","Benin",1991,0,1
+"266","Benin",1995,1,1
+"267","Benin",1996,0,1
+"268","Benin",1999,0,1
+"269","Benin",2001,0,1
+"270","Benin",2003,1,0
+"271","Mauritania",1992,0,1
+"272","Mauritania",1992,0,NA
+"273","Mauritania",1996,0,1
+"274","Mauritania",1997,0,0
+"275","Mauritania",2001,1,1
+"276","Mauritania",2003,0,0
+"277","Niger",1993,1,1
+"278","Niger",1993,1,NA
+"279","Niger",1995,1,1
+"280","Niger",1996,1,1
+"281","Niger",1996,0,1
+"282","Niger",1999,1,1
+"283","Niger",1999,1,1
+"284","Cote d’Ivoire",1990,0,0
+"285","Cote d’Ivoire",1990,0,0
+"286","Cote d’Ivoire",1995,1,1
+"287","Cote d’Ivoire",1995,1,1
+"288","Cote d’Ivoire",2000,1,1
+"289","Cote d’Ivoire",2000,1,1
+"290","Guinea",1993,1,1
+"291","Guinea",1995,1,1
+"292","Guinea",1998,1,0
+"293","Guinea",2002,1,1
+"294","Guinea",2003,0,1
+"295","Burkina Faso",1991,0,1
+"296","Burkina Faso",1992,0,1
+"297","Burkina Faso",1997,0,1
+"298","Burkina Faso",1998,0,1
+"299","Burkina Faso",2002,0,1
+"300","Liberia",1997,1,1
+"301","Sierra Leone",1996,1,1
+"302","Sierra Leone",2002,1,1
+"303","Ghana",1992,0,1
+"304","Ghana",1992,0,1
+"305","Ghana",1996,1,1
+"306","Ghana",2000,1,1
+"307","Togo",1990,0,0
+"308","Togo",1993,1,1
+"309","Togo",1994,0,1
+"310","Togo",1998,1,1
+"311","Togo",1999,0,1
+"312","Togo",2002,0,1
+"313","Togo",2003,0,1
+"314","Cameroon",1992,1,NA
+"315","Cameroon",1992,0,1
+"316","Cameroon",1997,0,1
+"317","Cameroon",1997,0,1
+"318","Cameroon",2002,0,1
+"319","Nigeria",1992,0,0
+"320","Nigeria",1993,0,1
+"321","Nigeria",1998,0,0
+"322","Nigeria",1999,1,1
+"323","Nigeria",1999,1,1
+"324","Nigeria",2003,1,1
+"325","Nigeria",2003,1,1
+"326","Gabon",1990,0,0
+"327","Gabon",1993,1,1
+"328","Gabon",1996,1,1
+"329","Gabon",1998,0,1
+"330","Gabon",2001,0,1
+"331","Central African Republic",1992,1,1
+"332","Central African Republic",1993,1,1
+"333","Central African Republic",1998,1,1
+"334","Central African Republic",1999,1,1
+"335","Chad",1990,0,0
+"336","Chad",1996,1,1
+"337","Chad",1997,0,1
+"338","Chad",2001,1,1
+"339","Chad",2002,0,1
+"340","Congo",1992,0,NA
+"341","Congo",1992,1,1
+"342","Congo",1993,1,1
+"343","Congo",2002,1,1
+"344","Congo",2002,0,1
+"345","Uganda",1994,1,0
+"346","Uganda",1996,1,1
+"347","Uganda",1996,1,1
+"348","Uganda",2001,0,1
+"349","Uganda",2001,0,1
+"350","Kenya",1992,1,1
+"351","Kenya",1994,0,1
+"352","Kenya",1997,0,1
+"353","Kenya",2002,0,1
+"354","Tanzania",1990,0,0
+"355","Tanzania",1995,1,1
+"356","Tanzania",2000,1,1
+"357","Burundi",1993,1,1
+"358","Burundi",1993,1,1
+"359","Rwanda",2003,1,1
+"360","Rwanda",2003,1,1
+"361","Djibouti",1992,1,1
+"362","Djibouti",1993,1,1
+"363","Djibouti",1997,0,0
+"364","Djibouti",1999,1,1
+"365","Djibouti",2003,0,1
+"366","Ethiopia",1994,1,1
+"367","Ethiopia",1995,0,1
+"368","Ethiopia",2000,1,1
+"369","Angola",1992,1,1
+"370","Mozambique",1994,1,1
+"371","Mozambique",1999,1,1
+"372","Zambia",1991,0,1
+"373","Zambia",1995,0,0
+"374","Zambia",1996,1,1
+"375","Zambia",2001,1,1
+"376","Zimbabwe",1990,0,1
+"377","Zimbabwe",1995,0,1
+"378","Zimbabwe",1996,0,0
+"379","Zimbabwe",2000,1,1
+"380","Zimbabwe",2002,0,1
+"381","Malawi",1992,0,0
+"382","Malawi",1994,1,1
+"383","Malawi",1999,1,1
+"384","South Africa",1994,1,1
+"385","South Africa",1999,1,1
+"386","Namibia",1994,1,1
+"387","Namibia",1999,1,1
+"388","Lesotho",1993,1,1
+"389","Lesotho",1998,1,1
+"390","Lesotho",2002,1,1
+"391","Botswana",1994,0,1
+"392","Botswana",1999,0,1
+"393","Swaziland",1993,0,0
+"394","Swaziland",1998,0,0
+"395","Swaziland",2003,0,1
+"396","Madagascar",1992,1,1
+"397","Madagascar",1993,1,1
+"398","Madagascar",1996,1,1
+"399","Madagascar",1998,0,1
+"400","Madagascar",2001,0,1
+"401","Madagascar",2002,1,0
+"402","Comoros",1990,0,0
+"403","Comoros",1992,0,1
+"404","Comoros",1993,0,0
+"405","Comoros",1996,1,1
+"406","Comoros",1996,1,1
+"407","Comoros",2002,1,1
+"408","Mauritius",1991,0,0
+"409","Mauritius",1995,0,0
+"410","Mauritius",2000,1,1
+"411","Morocco",1993,0,0
+"412","Morocco",1997,0,0
+"413","Morocco",2002,0,0
+"414","Algeria",1991,0,0
+"415","Algeria",1995,1,1
+"416","Algeria",1997,1,1
+"417","Algeria",1999,0,0
+"418","Algeria",2002,0,0
+"419","Tunisia",1994,0,0
+"420","Tunisia",1999,0,0
+"421","Sudan",1996,0,1
+"422","Sudan",2000,0,1
+"423","Iran",1992,0,0
+"424","Iran",1993,0,0
+"425","Iran",1996,0,0
+"426","Iran",1997,0,0
+"427","Iran",1998,0,1
+"428","Iran",2000,0,0
+"429","Iran",2001,0,0
+"430","Turkey",1991,0,0
+"431","Turkey",1995,0,0
+"432","Turkey",1999,0,0
+"433","Turkey",2002,0,1
+"434","Iraq",1995,0,0
+"435","Iraq",1996,0,0
+"436","Iraq",2000,0,0
+"437","Egypt",1990,0,1
+"438","Egypt",1993,0,1
+"439","Egypt",1995,0,0
+"440","Egypt",1999,0,NA
+"441","Egypt",2000,0,NA
+"442","Syria",1990,0,0
+"443","Syria",1991,0,0
+"444","Syria",1994,0,0
+"445","Syria",1998,0,0
+"446","Syria",1999,0,0
+"447","Syria",2000,0,0
+"448","Syria",2003,0,0
+"449","Lebanon",1992,0,NA
+"450","Lebanon",1996,0,1
+"451","Lebanon",2000,0,1
+"452","Jordan",1993,0,1
+"453","Jordan",1997,0,1
+"454","Jordan",2003,1,1
+"455","Israel",1992,0,0
+"456","Israel",1996,0,0
+"457","Israel",1999,0,0
+"458","Israel",2001,0,0
+"459","Israel",2003,0,0
+"460","Yemen",1993,0,1
+"461","Yemen",1997,1,1
+"462","Yemen",1999,0,1
+"463","Yemen",2003,1,1
+"464","Kuwait",1990,0,0
+"465","Kuwait",1992,0,0
+"466","Kuwait",1996,0,0
+"467","Kuwait",1999,0,0
+"468","Kuwait",2003,0,0
+"469","Bahrain",2002,0,1
+"470","Oman",2003,0,1
+"471","Turkmenistan",1992,0,0
+"472","Turkmenistan",1994,0,0
+"473","Turkmenistan",1998,0,0
+"474","Turkmenistan",1999,0,1
+"475","Turkmenistan",2003,0,1
+"476","Tajikistan",1991,0,0
+"477","Tajikistan",1994,0,1
+"478","Tajikistan",1995,0,1
+"479","Tajikistan",1999,1,1
+"480","Tajikistan",2000,0,1
+"481","Kyrgyz Republic",1991,0,0
+"482","Kyrgyz Republic",1995,1,1
+"483","Kyrgyz Republic",1995,1,NA
+"484","Kyrgyz Republic",2000,1,1
+"485","Kyrgyz Republic",2000,1,1
+"486","Uzbekistan",1991,0,0
+"487","Uzbekistan",1994,1,0
+"488","Uzbekistan",1999,0,1
+"489","Uzbekistan",2000,0,1
+"490","Kazakhstan",1994,0,1
+"491","Kazakhstan",1995,0,0
+"492","Kazakhstan",1995,0,1
+"493","Kazakhstan",1999,0,1
+"494","Kazakhstan",1999,0,1
+"495","Mongolia",1990,0,1
+"496","Mongolia",1992,0,1
+"497","Mongolia",1993,0,1
+"498","Mongolia",1996,0,1
+"499","Mongolia",1997,0,1
+"500","Mongolia",2000,0,1
+"501","Mongolia",2001,0,1
+"502","Taiwan",1991,0,0
+"503","Taiwan",1992,0,0
+"504","Taiwan",1995,0,0
+"505","Taiwan",1996,0,0
+"506","Taiwan",1998,0,0
+"507","Taiwan",2000,0,0
+"508","Taiwan",2001,0,0
+"509","North Korea",1990,0,0
+"510","North Korea",1998,0,0
+"511","North Korea",2003,0,0
+"512","South Korea",1992,0,0
+"513","South Korea",1992,0,0
+"514","South Korea",1996,0,0
+"515","South Korea",1997,0,0
+"516","South Korea",2000,0,1
+"517","South Korea",2002,0,1
+"518","India",1991,0,0
+"519","India",1996,0,1
+"520","India",1998,0,1
+"521","India",1999,0,1
+"522","Pakistan",1990,0,1
+"523","Pakistan",1993,0,1
+"524","Pakistan",1997,0,1
+"525","Pakistan",2002,0,1
+"526","Bangladesh",1991,0,1
+"527","Bangladesh",1996,0,1
+"528","Bangladesh",1996,1,1
+"529","Bangladesh",2001,1,1
+"530","Myanmar (Burma)",1990,0,0
+"531","Sri Lanka",1994,0,1
+"532","Sri Lanka",1994,0,1
+"533","Sri Lanka",1999,0,1
+"534","Sri Lanka",2000,0,1
+"535","Sri Lanka",2001,0,1
+"536","Nepal",1991,0,1
+"537","Nepal",1994,0,1
+"538","Nepal",1999,1,1
+"539","Thailand",1992,0,1
+"540","Thailand",1992,0,1
+"541","Thailand",1995,0,1
+"542","Thailand",1996,0,1
+"543","Thailand",2000,0,0
+"544","Thailand",2001,0,0
+"545","Cambodia",1993,0,1
+"546","Cambodia",1998,1,1
+"547","Cambodia",2003,1,1
+"548","Laos",1992,0,0
+"549","Laos",1997,0,0
+"550","Laos",2002,0,0
+"551","Democratic Republic of Vietnam",1992,0,0
+"552","Democratic Republic of Vietnam",1997,0,0
+"553","Democratic Republic of Vietnam",2002,0,0
+"554","Malaysia",1990,0,1
+"555","Malaysia",1995,0,0
+"556","Malaysia",1999,0,0
+"557","Singapore",1991,0,0
+"558","Singapore",1993,0,1
+"559","Singapore",1997,0,0
+"560","Singapore",2001,0,0
+"561","Philippines",1992,0,0
+"562","Philippines",1995,1,0
+"563","Philippines",1998,0,0
+"564","Philippines",2001,0,0
+"565","Indonesia",1992,0,0
+"566","Indonesia",1997,0,1
+"567","Indonesia",1999,1,1
+"568","Papua New Guinea",1992,0,1
+"569","Papua New Guinea",1997,0,1
+"570","Papua New Guinea",2002,0,1
+"571","Fiji",1992,0,0
+"572","Fiji",1994,0,0
+"573","Fiji",1999,0,0
+"574","Fiji",2001,0,1
